@@ -1,0 +1,40 @@
+version: "3.2"
+
+services:
+  database:
+    image: mysql:latest
+    container_name: project_mysql
+    command: --default-authentication-plugin=mysql_native_password
+    ports:
+      - "3306:3306"
+    volumes:
+      - ./docker/mysql:/var/lib/mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: superroot
+    healthcheck:
+      test:
+        [
+          "CMD-SHELL",
+          "mysqladmin",
+          "ping",
+          "-u",
+          "root",
+          "--password=$$MYSQL_ROOT_PASSWORD",
+          "-h",
+          "localhost",
+        ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    logging:
+      options:
+        max-size: 10m
+        max-file: "3"
+    networks:
+      - "dev_free-network"
+    expose:
+      - 3306
+
+networks:
+  dev_free-network:
+    external: true

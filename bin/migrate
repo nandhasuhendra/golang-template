@@ -1,0 +1,23 @@
+#!/bin/bash
+
+export $(grep -v '^#' .env | xargs -d '\n')
+
+if [[ $# -gt 0 ]]; then
+  case $1 in
+    -c|--create)
+      cmd="migrate create -ext sql -dir $PWD/db/migrations $2"
+      ;;
+    -u|--up)
+      cmd="migrate -database "$MYSQL_URL" -path $PWD/db/migrations up"
+      ;;
+    -d|--down)
+      cmd="migrate -database "$MYSQL_URL" -path $PWD/db/migrations down $2"
+      ;;
+    -f|--force)
+      cmd="migrate -database "$MYSQL_URL" -path $PWD/db/migrations force $2"
+      ;;
+  esac
+fi
+
+eval $cmd
+echo "Done"
